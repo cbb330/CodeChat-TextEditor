@@ -1,49 +1,49 @@
 'use babel';
 
 import LogViewerView from './log-viewer-view';
-import { CompositeDisposable } from 'atom';
+import { CompositeDisposable, Disposable } from 'atom';
 
 export default {
 
-  logViewerView: null,
-  logDock: null,
   subscriptions: null,
 
   activate(state) {
-    this.logViewerView = new LogViewerView(state.logViewerViewState);
-    this.logDock = atom.workspace.getRightDock({
-      item: this.logViewerView.getElement(),
-      visible: false
-    });
 
     // Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
-    this.subscriptions = new CompositeDisposable();
+    this.subscriptions = new CompositeDisposable(
+      // Add an opener for our view.
+      atom.workspace.addOpener(uri => {
+        if (uri === 'atom://log-viewer') {
+          return new LogViewerView();
+        }
+      }),
 
-    // Register command that toggles this view
-    this.subscriptions.add(atom.commands.add('atom-workspace', {
-      'log-viewer:toggle': () => this.toggle()
-    }));
+      // Register command that toggles this view
+      atom.commands.add('atom-workspace', {
+        'log-viewer:toggle': () => this.toggle()
+      }),
+
+      // Destroy any ActiveEditorInfoViews when the package is deactivated.
+      new Disposable(() => {
+        atom.workspace.getPaneItems().forEach(item => {
+          if (item instanceof LogViewerView) {
+            item.destroy();
+          }
+        });
+      })
+    );
   },
 
   deactivate() {
-    this.logDock.destroy();
     this.subscriptions.dispose();
-    this.logViewerView.destroy();
-  },
-
-  serialize() {
-    return {
-      logViewerViewState: this.logViewerView.serialize()
-    };
   },
 
   toggle() {
-    console.log('LogViewer was toggled!');
-    return (
-      this.logDock.isVisible() ?
-      this.logDock.hide() :
-      this.logDock.show()
-    );
+    atom.workspace.toggle('atom://log-viewer');
+  },
+
+  deserializeLogViewerView(serialized) {
+    return new LogViewerView();
   }
 
 };

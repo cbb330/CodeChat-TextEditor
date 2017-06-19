@@ -9,21 +9,57 @@ export default class LogViewerView {
 
     // Create message element
     const message = document.createElement('div');
-    message.textContent = 'The LogViewer package is Alive! It\'s ALIVE!';
+    message.textContent = 'BASE';
     message.classList.add('message');
     this.element.appendChild(message);
+
+    this.subscriptions = atom.workspace.getCenter().observeActivePaneItem(item => {
+      if (!atom.workspace.isTextEditor(item)) {
+        message.innerText = 'Open a file to preview it in this window.';
+        return;
+      }
+      message.innerHTML = item.getText();
+    });
   }
 
   // Returns an object that can be retrieved when package is activated
-  serialize() {}
+  serialize() {
+    return {
+      // This is used to look up the deserializer function. It can be any string, but it needs to be
+      // unique across all packages!
+      deserializer: 'log-viewer/LogViewerView'
+    };
+  }
 
   // Tear down any state and detach
   destroy() {
     this.element.remove();
+    this.subscriptions.dispose();
   }
 
   getElement() {
     return this.element;
+  }
+
+  getTitle() {
+    // Used by Atom for tab text
+    return 'Log Viewer';
+  }
+
+  getURI() {
+    // Used by Atom to identify the view when toggling.
+    return 'atom://log-viewer';
+  }
+
+  getDefaultLocation() {
+    // This location will be used if the user hasn't overridden it by dragging the item elsewhere.
+    // Valid values are "left", "right", "bottom", and "center" (the default).
+    return 'right';
+  }
+
+  getAllowedLocations() {
+    // The locations into which the item can be moved.
+    return ['left', 'right', 'bottom'];
   }
 
 }
