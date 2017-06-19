@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle log-viewer",
+        "command": "log-viewer:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "log-viewer",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "log-viewer:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
