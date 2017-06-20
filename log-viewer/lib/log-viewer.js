@@ -3,7 +3,10 @@
 import LogViewerView from './log-viewer-view';
 import { CompositeDisposable, Disposable } from 'atom';
 
+
+
 export default {
+
 
   subscriptions: null,
 

@@ -13,14 +13,14 @@ export default class LogViewerView {
     message.classList.add('message');
     this.element.appendChild(message);
 
-    this.subscriptions = atom.workspace.getCenter().observeActivePaneItem(item => {
-      if (!atom.workspace.isTextEditor(item)) {
-        message.innerText = 'Open a file to preview it in this window.';
-        return;
-      }
-      message.innerHTML = item.getText();
+    //event to record insertedtext
+    this.subscriptions = atom.workspace.getActiveTextEditor().onDidInsertText(event => {
+      message.textContent = event.text
+      console.log("Character Typed")
+      return;
     });
   }
+
 
   // Returns an object that can be retrieved when package is activated
   serialize() {
