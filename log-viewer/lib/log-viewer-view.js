@@ -3,22 +3,37 @@
 export default class LogViewerView {
 
   constructor(serializedState) {
-    // Create root element
+
+    //Root DOM element
     this.element = document.createElement('div');
     this.element.classList.add('log-viewer');
 
-    // Create message element
+    //DOM node that is visible in dock
     const message = document.createElement('div');
-    message.textContent = 'BASE';
+    //Formatting to allow new lines
+    message.textContent = 'Event Log' + '\r\n' + '-----------' + '\r\n';
+    message.setAttribute('style', 'white-space: pre;');
     message.classList.add('message');
     this.element.appendChild(message);
 
-    //event to record insertedtext
-    this.subscriptions = atom.workspace.getActiveTextEditor().onDidInsertText(event => {
-      message.textContent = event.text
-      console.log("Character Typed")
+
+
+    //Our attempt at handling subscriptions, we've so far attempted to implement insertText
+    this.subscriptions = atom.workspace.getCenter().observeActivePaneItem(item => {
+
+      //event to record insertedtext
+      item.onDidInsertText(event => {
+        message.textContent += ('Text Inserted: ' + event.text + '\r\n')
+        console.log("Character Typed")
+        return;
+      })
+
+
       return;
+
     });
+
+
   }
 
 
