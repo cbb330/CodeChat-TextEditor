@@ -1,5 +1,7 @@
 'use babel';
 
+const fs = require('fs');
+
 export default class LogViewerView {
 
   constructor(serializedState) {
@@ -13,8 +15,10 @@ export default class LogViewerView {
     message.classList.add('message');
     this.element.appendChild(message);
 
-    //event to record insertedtext
+    //atom.workspace.open('C:/Users/Christian/Documents/University/Dr. Jones Research/SmartGit Repo/AtomZMQ/log-viewer/LOG.txt');
+    //event to record insertedtext and save to lOG.txt file, pane, and console
     this.subscriptions = atom.workspace.getActiveTextEditor().onDidInsertText(event => {
+      fs.appendFile('C:/Users/Christian/Documents/University/Dr. Jones Research/SmartGit Repo/AtomZMQ/log-viewer/LOG.txt', event.text + '\r\n')
       message.textContent = event.text
       console.log("Character Typed")
       return;

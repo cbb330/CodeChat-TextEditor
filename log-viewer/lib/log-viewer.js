@@ -7,6 +7,7 @@ import { CompositeDisposable, Disposable } from 'atom';
 
 export default {
 
+  const { exec } = require('child_process');
 
   subscriptions: null,
 
@@ -20,6 +21,8 @@ export default {
           return new LogViewerView();
         }
       }),
+
+      //exec('python.exe' 'C:/Users/Christian/Documents/University/Dr. Jones Research/SmartGit Repo/AtomZMQ/log-viewer/LOGParse.py');
 
       // Register command that toggles this view
       atom.commands.add('atom-workspace', {
