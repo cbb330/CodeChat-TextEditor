@@ -5,19 +5,30 @@
 #
 
 import zmq
+import os
 
 context = zmq.Context()
-
-#  Socket to talk to server
-print("Connecting to hello world server…")
 socket = context.socket(zmq.REQ)
-socket.connect("tcp://127.0.0.1:5555")
+socket.connect("tcp://192.168.0.105:51816")
 
-#  Do 10 requests, waiting each time for a response
-for request in range(10):
-    print("Sending request %s …" % request)
-    socket.send(b"Hello")
+props = os.stat('test.txt')
+this = props.st_mtime
+last = this
 
-    #  Get the reply.
-    message = socket.recv()
-    print("Received reply %s [ %s ]" % (request, message))
+while 1:
+    file = open('test.txt')
+    if this > last:
+        last = this
+         
+        last_line = file.readlines()[-1]
+        last_line = last_line.strip('\n').strip(' ')
+        
+        socket.send_string(last_line)
+        print(last_line)
+        message = socket.recv()
+        print("Got it: %s" % message.decode())
+
+    props = os.stat('test.txt')      
+    this = props.st_mtime
+    file.close()
+    
