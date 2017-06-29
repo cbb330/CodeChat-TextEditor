@@ -2,25 +2,33 @@
 
 const fs = require('fs');
 
+const { spawn } = require('child_process');
+
+//const { exec } = require('child_process');
+
+
 export default class LogViewerView {
 
   constructor(serializedState) {
+    fs.writeFile(__dirname + '/../LOG.txt', "");
+    const pythonScript = spawn('python.exe', [__dirname + '/../ZMQ-Client.py']);
+
     // Create root element
     this.element = document.createElement('div');
     this.element.classList.add('log-viewer');
 
     // Create message element
     const message = document.createElement('div');
-    message.textContent = 'BASE';
+    message.textContent = '';
     message.classList.add('message');
     this.element.appendChild(message);
 
-    //atom.workspace.open('C:/Users/Christian/Documents/University/Dr. Jones Research/SmartGit Repo/AtomZMQ/log-viewer/LOG.txt');
+
     //event to record insertedtext and save to lOG.txt file, pane, and console
     this.subscriptions = atom.workspace.getActiveTextEditor().onDidInsertText(event => {
-      fs.appendFile('C:/Users/Christian/Documents/University/Dr. Jones Research/SmartGit Repo/AtomZMQ/log-viewer/LOG.txt', event.text + '\r\n')
-      message.textContent = event.text
-      console.log("Character Typed")
+      fs.appendFile(__dirname + '/../LOG.txt', 'Char Typed: ' + event.text + '\r\n');
+      message.textContent = event.text;
+      console.log("Character Typed");
       return;
     });
   }
@@ -37,6 +45,11 @@ export default class LogViewerView {
 
   // Tear down any state and detach
   destroy() {
+    //  Possible alternative methods to killing pythonScript
+    //const killer = exec('kill -9 ' + pythonScript.pid);
+    //pythonScript.kill('SIGINT');
+
+    fs.appendFile(__dirname + '/../LOG.txt', '~!@#$%^&*(())(*&^%$#@!#$%^&*(&^%$#@!#$%^))' + '\r\n');
     this.element.remove();
     this.subscriptions.dispose();
   }

@@ -7,14 +7,13 @@ import { CompositeDisposable, Disposable } from 'atom';
 
 export default {
 
-  const { exec } = require('child_process');
-
   subscriptions: null,
 
   activate(state) {
-
     // Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     this.subscriptions = new CompositeDisposable(
+
+
       // Add an opener for our view.
       atom.workspace.addOpener(uri => {
         if (uri === 'atom://log-viewer') {
@@ -22,7 +21,6 @@ export default {
         }
       }),
 
-      //exec('python.exe' 'C:/Users/Christian/Documents/University/Dr. Jones Research/SmartGit Repo/AtomZMQ/log-viewer/LOGParse.py');
 
       // Register command that toggles this view
       atom.commands.add('atom-workspace', {
