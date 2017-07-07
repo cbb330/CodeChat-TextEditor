@@ -1,18 +1,11 @@
 'use babel';
 
-const fs = require('fs');
-
-const { spawn } = require('child_process');
-
-//const { exec } = require('child_process');
-
+var net = require('net');
+//var d = new Date();
 
 export default class LogViewerView {
 
   constructor(serializedState) {
-    fs.writeFile(__dirname + '/../LOG.txt', "");
-    const pythonScript = spawn('python.exe', [__dirname + '/../ZMQ-Client.py']);
-
     // Create root element
     this.element = document.createElement('div');
     this.element.classList.add('log-viewer');
@@ -24,13 +17,31 @@ export default class LogViewerView {
     this.element.appendChild(message);
 
 
+    this.client = new net.Socket();
+
+    this.client.connect(50646, '172.17.153.75', function() {
+	     console.log('Connected');
+       //client.write(d.getMilliseconds().toString());
+     });
+
+     this.client.on('data', function(data) {
+       message.textContent = data;
+
+       console.log('Recieved: ' + data);
+     });
+
+
     //event to record insertedtext and save to lOG.txt file, pane, and console
     this.subscriptions = atom.workspace.getActiveTextEditor().onDidInsertText(event => {
-      fs.appendFile(__dirname + '/../LOG.txt', 'Char Typed: ' + event.text + '\r\n');
       message.textContent = event.text;
-      console.log("Character Typed");
+      //client.write(d.getMilliseconds().toString());
+      this.client.write('Text Inserted');
+      this.client.write(event.text);
+      //console.log("Character Typed");
       return;
     });
+
+
   }
 
 
@@ -45,13 +56,10 @@ export default class LogViewerView {
 
   // Tear down any state and detach
   destroy() {
-    //  Possible alternative methods to killing pythonScript
-    //const killer = exec('kill -9 ' + pythonScript.pid);
-    //pythonScript.kill('SIGINT');
-
-    fs.appendFile(__dirname + '/../LOG.txt', '~!@#$%^&*(())(*&^%$#@!#$%^&*(&^%$#@!#$%^))' + '\r\n');
+    this.client.destroy();
     this.element.remove();
     this.subscriptions.dispose();
+    //this.client.write('NO GOOD');
   }
 
   getElement() {
