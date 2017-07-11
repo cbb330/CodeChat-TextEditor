@@ -1,11 +1,19 @@
 'use babel';
 
 var net = require('net');
-//var d = new Date();
+var path = require('path');
+
 
 export default class LogViewerView {
 
   constructor(serializedState) {
+    this.client = new net.Socket();
+
+    this.client.connect(50646, '192.168.0.102', function() {
+       console.log('Connected');
+
+     });
+
     // Create root element
     this.element = document.createElement('div');
     this.element.classList.add('log-viewer');
@@ -16,34 +24,38 @@ export default class LogViewerView {
     message.classList.add('message');
     this.element.appendChild(message);
 
-
-    this.client = new net.Socket();
-
-    this.client.connect(50646, '172.17.153.75', function() {
-	     console.log('Connected');
-       //client.write(d.getMilliseconds().toString());
-     });
+    //this.client.on('close', function() {
+      //message.textContent = 'Lost connection to the server!';
+      //this.client.destroy();
+    //});
 
      this.client.on('data', function(data) {
-       message.textContent = data;
-
-       console.log('Recieved: ' + data);
+       message.innerHTML = data;
+       console.log('Recv');
      });
 
+     this.currView = atom.workspace.getActivePaneItem();
 
-    //event to record insertedtext and save to lOG.txt file, pane, and console
-    this.subscriptions = atom.workspace.getActiveTextEditor().onDidInsertText(event => {
-      message.textContent = event.text;
-      //client.write(d.getMilliseconds().toString());
-      this.client.write('Text Inserted');
-      this.client.write(event.text);
-      //console.log("Character Typed");
-      return;
-    });
+     this.onViewChange = atom.workspace.observeActivePaneItem(item => {
+       if (item != this.currView) {
+         this.currView = item;
+         this.onFileMod.dispose();
+
+       }
+
+       console.log('init');
+       this.client.write('{"cmd": "init", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
+
+       this.onFileMod = atom.workspace.getActiveTextEditor().onDidStopChanging(jibberish => {
+         console.log('modif');
+         this.client.write('{"cmd": "modif", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
+
+         return;
+        });
+     });
 
 
   }
-
 
   // Returns an object that can be retrieved when package is activated
   serialize() {
@@ -58,8 +70,8 @@ export default class LogViewerView {
   destroy() {
     this.client.destroy();
     this.element.remove();
-    this.subscriptions.dispose();
-    //this.client.write('NO GOOD');
+    this.onViewChange.dispose();
+    this.onFileMod.dispose();
   }
 
   getElement() {
