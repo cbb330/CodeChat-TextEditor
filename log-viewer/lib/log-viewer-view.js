@@ -9,10 +9,12 @@ export default class LogViewerView {
   constructor(serializedState) {
     this.client = new net.Socket();
 
-    this.client.connect(50646, '192.168.0.102', function() {
+    this.client.connect(50646, '192.168.0.104', function() {
        console.log('Connected');
+       console.log('init');
+       this.client.write('{"cmd": "init", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
 
-     });
+     }.bind(this));
 
     // Create root element
     this.element = document.createElement('div');
@@ -24,27 +26,30 @@ export default class LogViewerView {
     message.classList.add('message');
     this.element.appendChild(message);
 
-    //this.client.on('close', function() {
-      //message.textContent = 'Lost connection to the server!';
-      //this.client.destroy();
-    //});
+    this.client.on('close', function() {
+      message.textContent = 'Lost connection to the server!';
+      this.client.destroy();
+      this.onViewChange.dispose();
+      this.onFileMod.dispose();
+    }.bind(this));
 
      this.client.on('data', function(data) {
        message.innerHTML = data;
-       console.log('Recv');
+       console.log('recv')
      });
 
-     this.currView = atom.workspace.getActivePaneItem();
+     this.currView = atom.workspace.getActiveTextEditor();
 
-     this.onViewChange = atom.workspace.observeActivePaneItem(item => {
-       if (item != this.currView) {
-         this.currView = item;
+     this.onViewChange = atom.workspace.observeActiveTextEditor(editor => {
+       if (editor != this.currView) {
+         this.currView = editor;
          this.onFileMod.dispose();
+         console.log('init');
+         this.client.write('{"cmd": "init", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
 
        }
 
-       console.log('init');
-       this.client.write('{"cmd": "init", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
+
 
        this.onFileMod = atom.workspace.getActiveTextEditor().onDidStopChanging(jibberish => {
          console.log('modif');
@@ -68,10 +73,15 @@ export default class LogViewerView {
 
   // Tear down any state and detach
   destroy() {
-    this.client.destroy();
+    if (!this.client.destroyed) {
+      this.client.destroy();
+      this.onViewChange.dispose();
+      this.onFileMod.dispose();
+    }
+
+    console.log('destroyed');
     this.element.remove();
-    this.onViewChange.dispose();
-    this.onFileMod.dispose();
+
   }
 
   getElement() {
