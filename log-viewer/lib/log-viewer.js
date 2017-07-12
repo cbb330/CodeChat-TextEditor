@@ -1,3 +1,15 @@
+// *********** CodeChat Preview Plugin *********************************
+// 
+// *********** Created by Jack Betbeze and Christian Bush **************
+// *********** https://github.com/cbb330/CodeChat-TextEditor ***********
+//
+// 
+// *********** log-viewer.js *******************************************
+//
+// *** Initializes the entire plugin
+//
+// *********************************************************************
+
 'use babel';
 
 import LogViewerView from './log-viewer-view';

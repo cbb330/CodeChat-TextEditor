@@ -1,3 +1,16 @@
+// *********** CodeChat Preview Plugin *********************************
+// 
+// *********** Created by Jack Betbeze and Christian Bush **************
+// *********** https://github.com/cbb330/CodeChat-TextEditor ***********
+//
+// 
+// *********** log-viewer-view.js **************************************
+//
+// *** Handles preview pane functionality
+// *** Initializes connection and exchanges information with server
+//
+// *********************************************************************
+
 'use babel';
 
 var net = require('net');
@@ -26,6 +39,7 @@ export default class LogViewerView {
     message.classList.add('message');
     this.element.appendChild(message);
 
+	// Lost Connection Handler
     this.client.on('close', function() {
       message.textContent = 'Lost connection to the server!';
       this.client.destroy();
@@ -33,11 +47,13 @@ export default class LogViewerView {
       this.onFileMod.dispose();
     }.bind(this));
 
+	// Recieving Data
      this.client.on('data', function(data) {
        message.innerHTML = data;
        console.log('recv')
      });
-
+	
+	// Text Editor Switching Handling
      this.currView = atom.workspace.getActiveTextEditor();
 
      this.onViewChange = atom.workspace.observeActiveTextEditor(editor => {
@@ -50,7 +66,7 @@ export default class LogViewerView {
        }
 
 
-
+		// Text Editor Modification Handler
        this.onFileMod = atom.workspace.getActiveTextEditor().onDidStopChanging(jibberish => {
          console.log('modif');
          this.client.write('{"cmd": "modif", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
