@@ -1,6 +1,8 @@
+################################################
 #Python Server for recieving JSON objects
-#Created by Christian Bush on 7/12/2017
-
+#Created by Christian Bush on 7/12/2017, including functions by Enki and Dr. Bryan A. Jones
+#Server to handle Atom text edits to Markdown, ReST, CodeChat files
+################################################
 
 
 import socket
@@ -16,7 +18,6 @@ import codecs
 from queue import Queue
 
 
-#
 # Third-party imports
 # -------------------
 from PyQt5.QtCore import (pyqtSignal, Qt, QThread, QTimer, QUrl,
@@ -26,6 +27,8 @@ from PyQt5.QtGui import QDesktopServices, QIcon, QPalette, QWheelEvent
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
 from PyQt5 import uic
 import sip
+
+
 
 
 # Attempt importing CodeChat; failing that, disable the CodeChat
@@ -42,7 +45,7 @@ else:
 
 
 
-##----------------------------format------------------------
+##--------------------------format recieved------------------------
 #['{"cmd": "init", "data": ["C:/Users/jbetb/.atom/packages/log-viewer/CHANGELOG.md", ".md", "content"]}',
 #'## 0.1.0 - First Release\r\n* Every feature added\r\n* Every bug fixed\r\n']
 
@@ -64,8 +67,9 @@ def main():
     while 1:
         try:
             #recieve data up to 5000 bytes, decode and split dictionary and content
-            dataCommand = conn.recv(10000)
+            dataCommand = conn.recv(5000)
             dataCommand = dataCommand.decode()
+            #catch if client exits code or assorted error
             if (dataCommand == ''):
                 break
             #using client specified split point
@@ -76,18 +80,28 @@ def main():
             thisDict = json.loads(dataCommand[0])
             if (thisDict['data'][1] in markdownExts):
                 dataCommand[1] = _convertMarkdown(dataCommand[1])
-                conn.send(dataCommand[1].encode())
+                #find message length and prepend to converted text
+                msgLen = len(dataCommand[1])
+                msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
+                print(msgLen + dataCommand[1])
+                conn.send((msgLen + dataCommand[1]).encode())
             elif (thisDict['data'][1] == '.rst'):
                 dataCommand[1] = _convertReST(dataCommand[1])
-                conn.send(dataCommand[1][0].encode())
-                print(dataCommand[1][0])
+                #find message length and prepend to converted text
+                msgLen = len(dataCommand[1][0])
+                msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
+                print(msgLen + dataCommand[1][0]
+                conn.send((msgLen + dataCommand[1][0]).encode())
+                #if i wanted to send error string
                 #conn.send(dataCommand[1][1].encode())
             else:
                 dataCommand[1] = _convertCodeChat(dataCommand[1], thisDict['data'][0])
-                conn.send(dataCommand[1][1].encode())
-            
-            print(thisDict)
-            #conn.send(json.dumps(thisDict).encode())
+                #find message length and prepend to converted text
+                msgLen = len(dataCommand[1][1])
+                msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
+                print(msgLen + dataCommand[1][1])
+                conn.send((msgLen + dataCommand[1][1]).encode())
+                #other commands: filepath[1][0], ,error string[1][2], qurl[1][3]
             print(count)
             print('--------------------------------------------------\n\n\n\n\n\n\n')
             count += 1
@@ -97,26 +111,6 @@ def main():
             conn.close()
             break
 
-
-# Global functions taken from Enki, not written by Christian Bush
-# ================
-def copyTemplateFile(errors, source, templateFileName, dest, newName=None):
-    """For each sphinx project, two files are needed: ``index.rst`` as master
-    document, and ``conf.py`` as sphinx configuration file. Given a file with
-    ``templateFileName``, it will be copied to destination directory ``dest``.
-    If any error occurs during copy operation, error information will
-    be appended to ``errors``.
-    """
-    if not source or not dest:
-        raise OSError(2, "Input or output directory cannot be None", None)
-    if not newName:
-        newName = templateFileName
-    if not os.path.exists(os.path.join(dest, newName)):
-        sourcePath = os.path.join(source, templateFileName)
-        try:
-            shutil.copy(sourcePath, os.path.join(dest, newName))
-        except (IOError, OSError) as why:
-            errors.append((sourcePath, dest, str(why)))
 
             
 def _convertMarkdown(text):
