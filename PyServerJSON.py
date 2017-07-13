@@ -53,7 +53,7 @@ markdownExts = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd', '.mdwn','.mdtxt',
 
 def main():
     #initialize TCP connection
-    TCP_IP = '192.168.0.104'
+    TCP_IP = '192.168.0.103'
     TCP_PORT = 50646
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((TCP_IP, TCP_PORT))
@@ -67,40 +67,40 @@ def main():
     while 1:
         try:
             #recieve data up to 5000 bytes, decode and split dictionary and content
-            dataCommand = conn.recv(5000)
-            dataCommand = dataCommand.decode()
+            dataCommand = conn.recv(100000000)
+            dataCommand = dataCommand.decode('utf-8')
+            print(dataCommand)
             #catch if client exits code or assorted error
             if (dataCommand == ''):
                 break
             #using client specified split point
-            dataCommand = dataCommand.split('!@#$%^&*()')
-            print(dataCommand)
+            ###print(dataCommand)
             print('\n\nSending client message:\n')
             #create JSON object and then send back to client
-            thisDict = json.loads(dataCommand[0])
+            thisDict = json.loads(dataCommand)
             if (thisDict['data'][1] in markdownExts):
-                dataCommand[1] = _convertMarkdown(dataCommand[1])
+                thisDict['data'][2] = _convertMarkdown(thisDict['data'][2])
                 #find message length and prepend to converted text
-                msgLen = len(dataCommand[1])
+                msgLen = len(thisDict['data'][2])
                 msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + dataCommand[1])
-                conn.send((msgLen + dataCommand[1]).encode())
+                print(msgLen + thisDict['data'][2])
+                conn.send((msgLen + thisDict['data'][2]).encode())
             elif (thisDict['data'][1] == '.rst'):
-                dataCommand[1] = _convertReST(dataCommand[1])
+                thisDict['data'][2] = _convertReST(thisDict['data'][2])
                 #find message length and prepend to converted text
-                msgLen = len(dataCommand[1][0])
+                msgLen = len(thisDict['data'][2][0])
                 msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + dataCommand[1][0]
-                conn.send((msgLen + dataCommand[1][0]).encode())
+                print(msgLen + thisDict['data'][2][0])
+                conn.send((msgLen + thisDict['data'][2][0]).encode())
                 #if i wanted to send error string
-                #conn.send(dataCommand[1][1].encode())
+                #conn.send(thisDict['data'][2][1].encode())
             else:
-                dataCommand[1] = _convertCodeChat(dataCommand[1], thisDict['data'][0])
+                thisDict['data'][2] = _convertCodeChat(thisDict['data'][2], thisDict['data'][0])
                 #find message length and prepend to converted text
-                msgLen = len(dataCommand[1][1])
+                msgLen = len(thisDict['data'][2][1])
                 msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + dataCommand[1][1])
-                conn.send((msgLen + dataCommand[1][1]).encode())
+                print(msgLen + thisDict['data'][2][1])
+                conn.send((msgLen + thisDict['data'][2][1]).encode())
                 #other commands: filepath[1][0], ,error string[1][2], qurl[1][3]
             print(count)
             print('--------------------------------------------------\n\n\n\n\n\n\n')
