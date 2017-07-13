@@ -1,5 +1,19 @@
 'use babel';
 
+// *********** CodeChat Preview Plugin *********************************
+//
+// *********** Created by Jack Betbeze and Christian Bush **************
+// *********** https://github.com/cbb330/CodeChat-TextEditor ***********
+//
+//
+// *********** log-viewer-view.js **************************************
+//
+// *** Handles preview pane functionality
+// *** Initializes connection and exchanges information with server
+//
+// *********************************************************************
+
+
 var net = require('net');
 var path = require('path');
 
@@ -26,6 +40,7 @@ export default class LogViewerView {
     message.classList.add('message');
     this.element.appendChild(message);
 
+	// Lost Connection Handler
     this.client.on('close', function() {
       message.textContent = 'Lost connection to the server!';
       this.client.destroy();
@@ -33,11 +48,29 @@ export default class LogViewerView {
       this.onFileMod.dispose();
     }.bind(this));
 
+	// Recieving Data
+     var completeData = '';
+     var contentLength = 0;
+
      this.client.on('data', function(data) {
-       message.innerHTML = data;
-       console.log('recv')
+       console.log('recv');
+       if (completeData == '') {
+         contentLength = Number(data.slice(0, 10));
+         console.log(contentLength.toString());
+         completeData += data.toString().replace(data.slice(0, 10), "");
+       } else {
+         completeData += data;
+       }
+
+       if (completeData.length == contentLength) {
+         console.log('complete msg');
+         message.innerHTML = completeData;
+         completeData = '';
+       }
+
      });
 
+	// Text Editor Switching Handling
      this.currView = atom.workspace.getActiveTextEditor();
 
      this.onViewChange = atom.workspace.observeActiveTextEditor(editor => {
@@ -50,7 +83,7 @@ export default class LogViewerView {
        }
 
 
-
+		// Text Editor Modification Handler
        this.onFileMod = atom.workspace.getActiveTextEditor().onDidStopChanging(jibberish => {
          console.log('modif');
          this.client.write('{"cmd": "modif", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());

@@ -1,5 +1,16 @@
 'use babel';
 
+// *********** CodeChat Preview Plugin *********************************
+//
+// *********** Created by Jack Betbeze and Christian Bush **************
+// *********** https://github.com/cbb330/CodeChat-TextEditor ***********
+//
+//
+// *********** log-viewer-spec.js **************************************
+//
+// *********************************************************************
+
+
 import LogViewer from '../lib/log-viewer';
 
 // Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
