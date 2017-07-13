@@ -1,9 +1,11 @@
+'use babel';
+
 // *********** CodeChat Preview Plugin *********************************
-// 
+//
 // *********** Created by Jack Betbeze and Christian Bush **************
 // *********** https://github.com/cbb330/CodeChat-TextEditor ***********
 //
-// 
+//
 // *********** log-viewer-view.js **************************************
 //
 // *** Handles preview pane functionality
@@ -11,7 +13,6 @@
 //
 // *********************************************************************
 
-'use babel';
 
 var net = require('net');
 var path = require('path');
@@ -48,11 +49,27 @@ export default class LogViewerView {
     }.bind(this));
 
 	// Recieving Data
+     var completeData = '';
+     var contentLength = 0;
+
      this.client.on('data', function(data) {
-       message.innerHTML = data;
-       console.log('recv')
+       console.log('recv');
+       if (completeData == '') {
+         contentLength = Number(data.slice(0, 10));
+         console.log(contentLength.toString());
+         completeData += data.toString().replace(data.slice(0, 10), "");
+       } else {
+         completeData += data;
+       }
+
+       if (completeData.length == contentLength) {
+         console.log('complete msg');
+         message.innerHTML = completeData;
+         completeData = '';
+       }
+
      });
-	
+
 	// Text Editor Switching Handling
      this.currView = atom.workspace.getActiveTextEditor();
 
