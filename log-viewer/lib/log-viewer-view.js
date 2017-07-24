@@ -23,10 +23,19 @@ export default class LogViewerView {
   constructor(serializedState) {
     this.client = new net.Socket();
 
-    this.client.connect(50646, '192.168.0.104', function() {
+    this.client.connect(50646, '192.168.0.103', function() {
        console.log('Connected');
        console.log('init');
-       this.client.write('{"cmd": "init", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
+       msg = {
+         cmd: 'init',
+         data: [atom.workspace.getActiveTextEditor().getPath(), atom.workspace.getActiveTextEditor().getText()]
+       };
+
+       // I'm using the `JSON <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON>`_
+
+
+       this.client.write(JSON.stringify(msg));
+       //this.client.write('{"cmd": "init", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
 
      }.bind(this));
 
@@ -77,17 +86,24 @@ export default class LogViewerView {
        if (editor != this.currView) {
          this.currView = editor;
          this.onFileMod.dispose();
-         console.log('init');
-         this.client.write('{"cmd": "init", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
+         msg = {
+           cmd: 'init',
+           data: [atom.workspace.getActiveTextEditor().getPath(), atom.workspace.getActiveTextEditor().getText()]
+         };
 
+         this.client.write(JSON.stringify(msg));
        }
 
 
 		// Text Editor Modification Handler
        this.onFileMod = atom.workspace.getActiveTextEditor().onDidStopChanging(jibberish => {
          console.log('modif');
-         this.client.write('{"cmd": "modif", "data": ["' + atom.workspace.getActiveTextEditor().getPath().replace(/\\/g, "/") + '", "' + path.extname(atom.workspace.getActiveTextEditor().getPath()) + '", "content"]}' + '!@#$%^&*()' + atom.workspace.getActiveTextEditor().getText());
+         msg = {
+           cmd: 'modif',
+           data: [atom.workspace.getActiveTextEditor().getPath(), atom.workspace.getActiveTextEditor().getText()]
+         };
 
+         this.client.write(JSON.stringify(msg));
          return;
         });
      });
