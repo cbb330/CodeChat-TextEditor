@@ -1,10 +1,15 @@
-################################################
-#Python Server for recieving JSON objects
-#Created by Christian Bush on 7/12/2017, including functions by Enki and Dr. Bryan A. Jones
-#Server to handle Atom text edits to Markdown, ReST, CodeChat files
-################################################
-
-
+# ..
+#     Python Server for recieving JSON objects
+#     Created by Christian Bush on 7/12/2017, including functions by Enki and Dr. Bryan A. Jones
+#     Server to handle Atom text edits to Markdown, ReST, CodeChat files
+#
+# ***************************************************************
+# PyServerJson.py - invokes CodeChat after recieiving JSON object
+# ***************************************************************
+#
+#
+# Local imports
+# -------------
 import socket
 import json
 import os.path
@@ -16,10 +21,10 @@ import sys
 import shlex
 import codecs
 from queue import Queue
-
-
+#
 # Third-party imports
 # -------------------
+# `PyQt <http://pyqt.sourceforge.net/Docs/PyQt4/classes.html>`_ is the GUI used by legacy software Enki, still tied to CodeChat
 from PyQt5.QtCore import (pyqtSignal, Qt, QThread, QTimer, QUrl,
                           QEventLoop, QObject)
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget
@@ -27,10 +32,7 @@ from PyQt5.QtGui import QDesktopServices, QIcon, QPalette, QWheelEvent
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
 from PyQt5 import uic
 import sip
-
-
-
-
+#
 # Attempt importing CodeChat; failing that, disable the CodeChat
 # feature.
 try:
@@ -42,77 +44,84 @@ except ImportError:
     CodeToRest = None
 else:
     import CodeChat.CodeToRest as CodeToRest
-
-
-
-##--------------------------format recieved------------------------
-#['{"cmd": "init", "data": ["C:/Users/jbetb/.atom/packages/log-viewer/CHANGELOG.md", ".md", "content"]}',
-#'## 0.1.0 - First Release\r\n* Every feature added\r\n* Every bug fixed\r\n']
-
-markdownExts = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd', '.mdwn','.mdtxt', '.mdtext', '.Rmd']
-
+#
+# Body
+# ----
+#
 def main():
-    #initialize TCP connection
+    # All common markdownExts to be used later
+    markdownExts = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd', '.mdwn','.mdtxt', '.mdtext', '.Rmd']
+    # initialize TCP connection to user specified IP/Port
     TCP_IP = '192.168.0.103'
     TCP_PORT = 50646
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((TCP_IP, TCP_PORT))
     s.listen(1)
-    print("listening") #Program waits here until client connects
+    # Print a note while program waits here until an accept
+    print("listening")
     conn, addr = s.accept()
+    # Print connection address and then initiliaze a count for JSON Objects sent
     print('Connection address:', addr)
     count = 0
-
-    #lookp for multiple client entries
+#
+#
+    # Main While - loops until user exits
+    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     while 1:
         try:
-            #recieve data up to 5000 bytes, decode and split dictionary and content
+            # recieve data up to 100000000 bytes, decode and split dictionary and content into the JSON Object
             dataCommand = conn.recv(100000000)
             dataCommand = dataCommand.decode('utf-8')
             print(dataCommand)
-            #catch if client exits code or assorted error
+            # catch if client exits code or assorted error
             if (dataCommand == ''):
                 break
-            #using client specified split point
-            ###print(dataCommand)
+            # using client specified split point
+            ### print(dataCommand)
             print('\n\nSending client message:\n')
-            #create JSON object and then send back to client
+            # create JSON object and then send back to client
+            # .. note::
+            #     Format for JSON Objects: ['{"cmd": "init", "data": ["C:/Users/jbetb/.atom/packages/log-viewer/CHANGELOG.md", "content"]}'
             thisDict = json.loads(dataCommand)
-            if (thisDict['data'][1] in markdownExts):
-                thisDict['data'][2] = _convertMarkdown(thisDict['data'][2])
-                #find message length and prepend to converted text
-                msgLen = len(thisDict['data'][2])
+            actvExt = os.path.splitext(thisDict['data'][0])[1]
+            if (actvExt in markdownExts):
+                thisDict['data'][1] = _convertMarkdown(thisDict['data'][1])
+                # find message length and prepend to converted text
+                msgLen = len(thisDict['data'][1])
                 msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + thisDict['data'][2])
-                conn.send((msgLen + thisDict['data'][2]).encode())
-            elif (thisDict['data'][1] == '.rst'):
-                thisDict['data'][2] = _convertReST(thisDict['data'][2])
-                #find message length and prepend to converted text
-                msgLen = len(thisDict['data'][2][0])
+                print(msgLen + thisDict['data'][1])
+                conn.send((msgLen + thisDict['data'][1]).encode())
+            elif (actvExt == '.rst'):
+                thisDict['data'][1] = _convertReST(thisDict['data'][1])
+                # find message length and prepend to converted text
+                msgLen = len(thisDict['data'][1][0])
                 msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + thisDict['data'][2][0])
-                conn.send((msgLen + thisDict['data'][2][0]).encode())
-                #if i wanted to send error string
-                #conn.send(thisDict['data'][2][1].encode())
+                print(msgLen + thisDict['data'][1][0])
+                conn.send((msgLen + thisDict['data'][1][0]).encode())
+                # .. tip::
+                #     if i wanted to send error string
+                #     conn.send(thisDict['data'][2][1].encode())
             else:
-                thisDict['data'][2] = _convertCodeChat(thisDict['data'][2], thisDict['data'][0])
-                #find message length and prepend to converted text
-                msgLen = len(thisDict['data'][2][1])
+                thisDict['data'][1] = _convertCodeChat(thisDict['data'][1], thisDict['data'][0])
+                # find message length and prepend to converted text
+                msgLen = len(thisDict['data'][1][1])
                 msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + thisDict['data'][2][1])
-                conn.send((msgLen + thisDict['data'][2][1]).encode())
-                #other commands: filepath[1][0], ,error string[1][2], qurl[1][3]
+                print(msgLen + thisDict['data'][1][1])
+                conn.send((msgLen + thisDict['data'][1][1]).encode())
+                # ..tip::
+                #     other commands: filepath[1][0], ,error string[1][2], qurl[1][3]
             print(count)
             print('--------------------------------------------------\n\n\n\n\n\n\n')
             count += 1
-        #catch when client exits code 
+        # catch when client exits code
         except ConnectionAbortedError or ConnectionResetError:
             print("client closed")
             conn.close()
             break
+#
+# Conversion functions - spliced from Enki and Dr. Bryan A. Jones
+# ---------------------------------------------------------------
 
-
-            
 def _convertMarkdown(text):
     """Convert Markdown to HTML
     """
@@ -127,7 +136,7 @@ def _convertMarkdown(text):
     #if markdown.version_info[0] > 2 or \
     #   (markdown.version_info[0] == 2 and markdown.version_info[1] > 0):
 
-        
+
 ##        DEL_RE = r'(--)(.*?)--'
 ##        INS_RE = r'(__)(.*?)__'
 ##        STRONG_RE = r'(\*\*)(.*?)\*\*'
