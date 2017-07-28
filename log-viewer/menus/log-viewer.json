@@ -12,13 +12,8 @@
       "label": "Packages",
       "submenu": [
         {
-          "label": "log-viewer",
-          "submenu": [
-            {
-              "label": "Toggle",
-              "command": "log-viewer:toggle"
-            }
-          ]
+          "label": "CodeChat Preview",
+          "command": "log-viewer:toggle"
         }
       ]
     }

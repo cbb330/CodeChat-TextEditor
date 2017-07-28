@@ -23,7 +23,7 @@ export default class LogViewerView {
   constructor(serializedState) {
     this.client = new net.Socket();
 
-    this.client.connect(50646, '192.168.0.103', function() {
+    this.client.connect(50646, '127.0.0.1', function() {
        console.log('Connected');
        console.log('init');
        msg = {
@@ -139,7 +139,7 @@ export default class LogViewerView {
 
   getTitle() {
     // Used by Atom for tab text
-    return 'Log Viewer';
+    return 'CodeChat Preview';
   }
 
   getURI() {
