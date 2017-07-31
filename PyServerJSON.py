@@ -12,6 +12,7 @@
 # -------------
 import socket
 import json
+import threading
 import os.path
 import io
 import re
@@ -44,15 +45,102 @@ except ImportError:
     CodeToRest = None
 else:
     import CodeChat.CodeToRest as CodeToRest
+
+# Multi-Thread Server class
+# -------------------------
+#
+class ThreadedServer(object):
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind((self.host, self.port))
+        self.count = 0
+        self.address = None
+    # function to listen for new clients to start a thread
+    def listen(self):
+        self.sock.listen(5)
+        while True:
+            client, self.address = self.sock.accept()
+            self.count = 0
+            #client.settimeout(120)
+            threading.Thread(target = self.listenToClient,args = (client,self.address)).start()
+    # function that recieves client input
+    def listenToClient(self, client, address):
+        # All common markdownExts to be used later
+        markdownExts = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd', '.mdwn','.mdtxt', '.mdtext', '.Rmd']
+        while 1:
+            try:
+                # recieve data up to 100000000 bytes, decode and split dictionary and content into the JSON Object
+                dataCommand = client.recv(1000000)
+                dataCommand = dataCommand.decode('utf-8')
+                print(dataCommand)
+                # catch if client exits code or assorted error
+                if (dataCommand == ''):
+                    break
+                ### print(dataCommand)
+                print('\n\nSending client message:\n')
+                # create JSON object and then send back to client
+                # .. note::
+                #     Format for JSON Objects: ['{"cmd": "init", "data": ["C:/Users/jbetb/.atom/packages/log-viewer/CHANGELOG.md", "content"]}'
+                thisDict = json.loads(dataCommand)
+                actvExt = os.path.splitext(thisDict['data'][0])[1]
+                if (actvExt in markdownExts):
+                    thisDict['data'][1] = _convertMarkdown(thisDict['data'][1])
+                    client.send(self.secureHtml(thisDict['data'][1]))
+                elif (actvExt == '.rst'):
+                    thisDict['data'][1] = _convertReST(thisDict['data'][1])
+                    client.send(self.secureHtml(thisDict['data'][1][0]))
+                    # .. tip::
+                    #     if i wanted to send error string
+                    #     client.send(secureHtml(thisDict['data'][2][1]))
+                else:
+                    thisDict['data'][1] = _convertCodeChat(thisDict['data'][1], thisDict['data'][0])
+                    client.send((self.secureHtml(thisDict['data'][1][1])))
+                    # ..tip::
+                    #     other commands: filepath[1][0], ,error string[1][2], qurl[1][3]
+                self.count += 1
+                print(self.address, self.count)
+                print('--------------------------------------------------\n\n\n\n\n\n\n')
+            # catch when client exits code
+            except ConnectionAbortedError or ConnectionResetError:
+                print("client closed")
+                client.close()
+                break
+            
+    # Security Function
+    #
+    def secureHtml(self, htmlString):
+        # I am using `iframe <https://www.w3schools.com/tags/att_iframe_src.asp>`_ tag to secure the html string in a
+        # non executable sandbox
+        htmlString = htmlString.replace('"', '&quot;')
+        htmlString = '<!DOCTYPE html><html><body style="margin:0px;padding:0px;overflow:hidden"><iframe srcdoc="' + htmlString
+        htmlString += '" frameborder="0" style="overflow:hidden;overflow-x:hidden;overflow-y:hidden;height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px" height="100%" width="100%"><p>Your browser does not support iframes.</p></iframe></body></html>'
+        print(htmlString)
+        # Below I am prepending the message length so the client can recieve correct
+        # length of HTML string. Then I am sending the output to the client
+        msgLen = len(htmlString)
+        msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
+        return (msgLen + htmlString).encode()
+    
+def main():
+    while True:
+        port_num = input("Port? ")
+        try:
+            port_num = int(port_num)
+            break
+        except ValueError:
+            pass
+
+    ThreadedServer('',port_num).listen()
 #
 # Body
 # ----
-#
-def main():
-    # All common markdownExts to be used later
-    markdownExts = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd', '.mdwn','.mdtxt', '.mdtext', '.Rmd']
+    
     # initialize TCP connection to user specified IP/Port
-    TCP_IP = '192.168.0.103'
+    '''
+    TCP_IP = '192.168.0.105'
     TCP_PORT = 50646
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((TCP_IP, TCP_PORT))
@@ -63,65 +151,24 @@ def main():
     # Print connection address and then initiliaze a count for JSON Objects sent
     print('Connection address:', addr)
     count = 0
+    '''
 #
 #
     # Main While - loops until user exits
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    while 1:
-        try:
-            # recieve data up to 100000000 bytes, decode and split dictionary and content into the JSON Object
-            dataCommand = conn.recv(100000000)
-            dataCommand = dataCommand.decode('utf-8')
-            print(dataCommand)
-            # catch if client exits code or assorted error
-            if (dataCommand == ''):
-                break
-            # using client specified split point
-            ### print(dataCommand)
-            print('\n\nSending client message:\n')
-            # create JSON object and then send back to client
-            # .. note::
-            #     Format for JSON Objects: ['{"cmd": "init", "data": ["C:/Users/jbetb/.atom/packages/log-viewer/CHANGELOG.md", "content"]}'
-            thisDict = json.loads(dataCommand)
-            actvExt = os.path.splitext(thisDict['data'][0])[1]
-            if (actvExt in markdownExts):
-                thisDict['data'][1] = _convertMarkdown(thisDict['data'][1])
-                # find message length and prepend to converted text
-                msgLen = len(thisDict['data'][1])
-                msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + thisDict['data'][1])
-                conn.send((msgLen + thisDict['data'][1]).encode())
-            elif (actvExt == '.rst'):
-                thisDict['data'][1] = _convertReST(thisDict['data'][1])
-                # find message length and prepend to converted text
-                msgLen = len(thisDict['data'][1][0])
-                msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + thisDict['data'][1][0])
-                conn.send((msgLen + thisDict['data'][1][0]).encode())
-                # .. tip::
-                #     if i wanted to send error string
-                #     conn.send(thisDict['data'][2][1].encode())
-            else:
-                thisDict['data'][1] = _convertCodeChat(thisDict['data'][1], thisDict['data'][0])
-                # find message length and prepend to converted text
-                msgLen = len(thisDict['data'][1][1])
-                msgLen = str(msgLen).join('0000000000'.rsplit(len(str(msgLen))*'0', 1))
-                print(msgLen + thisDict['data'][1][1])
-                conn.send((msgLen + thisDict['data'][1][1]).encode())
-                # ..tip::
-                #     other commands: filepath[1][0], ,error string[1][2], qurl[1][3]
-            print(count)
-            print('--------------------------------------------------\n\n\n\n\n\n\n')
-            count += 1
-        # catch when client exits code
-        except ConnectionAbortedError or ConnectionResetError:
-            print("client closed")
-            conn.close()
-            break
+
+
+
+    
+
+
+
+
+
 #
 # Conversion functions - spliced from Enki and Dr. Bryan A. Jones
 # ---------------------------------------------------------------
-
+# 
 def _convertMarkdown(text):
     """Convert Markdown to HTML
     """
