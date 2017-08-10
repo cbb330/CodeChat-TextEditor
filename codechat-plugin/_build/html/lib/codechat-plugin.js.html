@@ -1,0 +1,165 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &#8212; Project Name version 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/CodeChat.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'version 0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Project Name version 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="code highlight-python"><div class="highlight"><pre><span></span><span class="s1">&#39;use babel&#39;</span><span class="p">;</span>
+ 
+</pre></div>
+</div>
+<p><strong>*******</strong> CodeChat Preview Plugin <strong>*****************************</strong></p>
+<p><strong>*******</strong> Created by Jack Betbeze and Christian Bush <strong>**********</strong>
+<strong>*******</strong> <a class="reference external" href="https://github.com/cbb330/CodeChat-TextEditor">https://github.com/cbb330/CodeChat-TextEditor</a> <strong>*******</strong></p>
+<p><strong>*******</strong> log-viewer.js <strong>***************************************</strong></p>
+<p><a href="#id1"><span class="problematic" id="id2">**</span></a>* Initializes the entire plugin</p>
+<div class="system-message" id="id1">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">C:\Users\jbetb\github\codechat-plugin\lib\codechat-plugin.js</tt>, line 11); <em><a href="#id2">backlink</a></em></p>
+Inline strong start-string without end-string.</div>
+<hr class="docutils" />
+<div class="code highlight-python"><div class="highlight"><pre><span></span> 
+<span class="kn">import</span> <span class="nn">CodechatPluginView</span> <span class="nn">from</span> <span class="s1">&#39;./codechat-plugin-view&#39;</span><span class="p">;</span>
+<span class="kn">import</span> <span class="p">{</span> <span class="n">CompositeDisposable</span><span class="p">,</span> <span class="n">Disposable</span> <span class="p">}</span> <span class="kn">from</span> <span class="s1">&#39;atom&#39;</span><span class="p">;</span>
+
+
+
+<span class="n">export</span> <span class="n">default</span> <span class="p">{</span>
+
+  <span class="n">subscriptions</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+
+  <span class="n">activate</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="p">{</span>
+</pre></div>
+</div>
+<div style="margin-left:2.0em;"><p>Events subscribed to in atom’s system can be easily cleaned up with a CompositeDisposable</p>
+</div><div class="code highlight-python"><div class="highlight"><pre><span></span>    <span class="n">this</span><span class="o">.</span><span class="n">subscriptions</span> <span class="o">=</span> <span class="n">new</span> <span class="n">CompositeDisposable</span><span class="p">(</span>
+ 
+ 
+</pre></div>
+</div>
+<div style="margin-left:3.0em;"><p>Add an opener for our view.</p>
+</div><div class="code highlight-python"><div class="highlight"><pre><span></span>      <span class="n">atom</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">addOpener</span><span class="p">(</span><span class="n">uri</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">uri</span> <span class="o">===</span> <span class="s1">&#39;atom://codechat-plugin&#39;</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="n">new</span> <span class="n">CodechatPluginView</span><span class="p">();</span>
+        <span class="p">}</span>
+      <span class="p">}),</span>
+ 
+ 
+</pre></div>
+</div>
+<div style="margin-left:3.0em;"><p>Register command that toggles this view</p>
+</div><div class="code highlight-python"><div class="highlight"><pre><span></span>      <span class="n">atom</span><span class="o">.</span><span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;atom-workspace&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;codechat-plugin:toggle&#39;</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="n">this</span><span class="o">.</span><span class="n">toggle</span><span class="p">()</span>
+      <span class="p">}),</span>
+ 
+</pre></div>
+</div>
+<div style="margin-left:3.0em;"><p>Destroy any ActiveEditorInfoViews when the package is deactivated.</p>
+</div><div class="code highlight-python"><div class="highlight"><pre><span></span>      <span class="n">new</span> <span class="n">Disposable</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">getPaneItems</span><span class="p">()</span><span class="o">.</span><span class="n">forEach</span><span class="p">(</span><span class="n">item</span> <span class="o">=&gt;</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">item</span> <span class="n">instanceof</span> <span class="n">LogViewerView</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">destroy</span><span class="p">();</span>
+          <span class="p">}</span>
+        <span class="p">});</span>
+      <span class="p">})</span>
+    <span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="n">deactivate</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">this</span><span class="o">.</span><span class="n">subscriptions</span><span class="o">.</span><span class="n">dispose</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="n">toggle</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">atom</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">toggle</span><span class="p">(</span><span class="s1">&#39;atom://codechat-plugin&#39;</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="n">deserializeCodechatPluginView</span><span class="p">(</span><span class="n">serialized</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">new</span> <span class="n">CodechatPluginView</span><span class="p">();</span>
+  <span class="p">}</span>
+
+<span class="p">};</span>
+</pre></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/lib/codechat-plugin.js.js.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Project Name version 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Author.
+      Last updated on Aug, 09, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.1.
+    </div>
+  </body>
+</html>

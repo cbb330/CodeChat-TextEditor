@@ -1,0 +1,21 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle codechat-plugin",
+        "command": "codechat-plugin:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "CodeChat",
+          "command": "codechat-plugin:toggle"
+        }
+      ]
+    }
+  ]
+}

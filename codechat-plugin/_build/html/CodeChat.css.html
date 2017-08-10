@@ -1,0 +1,210 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CodeChat.css - Style sheet for CodeChat docs &#8212; Project Name version 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/CodeChat.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'version 0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="template/conf.py - Template configuration file for a Sphinx CodeChat project" href="conf.py.html" />
+    <link rel="prev" title="Welcome to template’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="conf.py.html" title="template/conf.py - Template configuration file for a Sphinx CodeChat project"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to template’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Project Name version 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="codechat-css-style-sheet-for-codechat-docs">
+<h1>CodeChat.css - Style sheet for CodeChat docs<a class="headerlink" href="#codechat-css-style-sheet-for-codechat-docs" title="Permalink to this headline">¶</a></h1>
+<p>Stylesheet for use with CodeChat’s extensions to Docutils.</p>
+<p>The overall goal is to allow comments (everything but <code class="docutils literal"><span class="pre">&lt;pre&gt;</span></code> tags) to
+appear with normal (double) spacing, while comments and code are single
+spaced.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Bryan A. Jones</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Contact:</th><td class="field-body">bjones AT ece DOT msstate DOT edu</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Copyright:</th><td class="field-body">This stylesheet has been placed in the public domain.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>This will cause an error if the html4css1 style sheet is embedded instead of
+linked, though the page still displays without problems. However, omitting
+it will cause the linked stylesheet case to fail, so leave this in.</p>
+<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="nd">@import</span> <span class="n">url</span><span class="p">(</span><span class="n">html4css1</span><span class="o">.</span><span class="n">css</span><span class="p">);</span>
+ 
+</pre></div>
+</div>
+<p>Remove all top and bottom space around <code class="docutils literal"><span class="pre">&lt;pre&gt;</span></code>, making it single-spaced.
+Also, remove the border so that code and comments mix more naturally.</p>
+<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="n">pre</span> <span class="p">{</span>
+    <span class="n">padding</span><span class="p">:</span> <span class="mi">0</span><span class="n">px</span><span class="p">;</span>
+    <span class="n">margin</span><span class="o">-</span><span class="n">top</span><span class="p">:</span> <span class="mi">0</span><span class="n">px</span><span class="p">;</span>
+    <span class="n">margin</span><span class="o">-</span><span class="n">bottom</span><span class="p">:</span> <span class="mi">0</span><span class="n">px</span><span class="p">;</span>
+    <span class="n">border</span><span class="p">:</span> <span class="n">none</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+</pre></div>
+</div>
+<p>reST’s default style sheet indents literal blocks. Remove this indent.</p>
+<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="n">pre</span><span class="o">.</span><span class="n">literal</span><span class="o">-</span><span class="n">block</span> <span class="p">{</span>
+    <span class="n">margin</span><span class="o">-</span><span class="n">left</span><span class="p">:</span> <span class="mi">0</span><span class="n">px</span><span class="p">;</span>
+    <span class="n">margin</span><span class="o">-</span><span class="n">right</span><span class="p">:</span> <span class="mi">0</span><span class="n">px</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+</pre></div>
+</div>
+<p>Remove the bottom margin around all elements, so they’re only separated
+by a top margin.</p>
+<blockquote>
+<div>This is actually a bad thing: the spacing between dissimilar elements may
+not be correct. However, I can’t find a CSS rule to modify the
+margins of elements which preceed code, so I just change them all.</div></blockquote>
+<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="n">p</span><span class="p">,</span> <span class="n">blockquote</span><span class="p">,</span> <span class="n">div</span><span class="o">.</span><span class="n">body</span> <span class="n">h1</span><span class="p">,</span> <span class="n">div</span><span class="o">.</span><span class="n">body</span> <span class="n">h2</span><span class="p">,</span> <span class="n">div</span><span class="o">.</span><span class="n">body</span> <span class="n">h3</span><span class="p">,</span> <span class="n">div</span><span class="o">.</span><span class="n">body</span> <span class="n">h4</span><span class="p">,</span> <span class="n">div</span><span class="o">.</span><span class="n">body</span> <span class="n">h5</span><span class="p">,</span> <span class="n">div</span><span class="o">.</span><span class="n">body</span> <span class="n">h6</span><span class="p">,</span> <span class="n">div</span><span class="o">.</span><span class="n">body</span> <span class="n">ul</span>   <span class="o">/*</span> <span class="n">Sphinx</span> <span class="o">*/</span>
+               <span class="n">div</span> <span class="n">h1</span><span class="p">,</span>      <span class="n">div</span> <span class="n">h2</span><span class="p">,</span>      <span class="n">div</span> <span class="n">h3</span><span class="p">,</span>      <span class="n">div</span> <span class="n">h4</span><span class="p">,</span>      <span class="n">div</span> <span class="n">h5</span><span class="p">,</span>      <span class="n">div</span> <span class="n">h6</span><span class="p">,</span>      <span class="n">div</span> <span class="n">ul</span><span class="o">.</span><span class="n">simple</span> <span class="o">/*</span> <span class="n">docutils</span> <span class="o">*/</span>
+<span class="p">{</span>
+    <span class="n">margin</span><span class="o">-</span><span class="n">bottom</span><span class="p">:</span> <span class="mi">0</span><span class="n">px</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+</pre></div>
+</div>
+<p>Paragraphs have a non-zero margin-top, which adds a blank line when it
+follows code. Remove this.</p>
+<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="n">div</span> <span class="n">p</span><span class="p">:</span><span class="n">first</span><span class="o">-</span><span class="n">child</span> <span class="p">{</span>
+  <span class="n">margin</span><span class="o">-</span><span class="n">top</span><span class="p">:</span> <span class="mi">0</span><span class="n">px</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+</pre></div>
+</div>
+<p>Remove the top margin of all comments which follow code, placing them
+next to code. Note that Sphinx encloses code in a
+<code class="docutils literal"><span class="pre">&lt;div</span> <span class="pre">class=&quot;highlight-language_name&quot;&gt;</span></code> element.</p>
+<p>Also, note that this will need to be duplicated for all highlighted
+languages (yuck). I can’t find a CSS rule to select class named using a
+regular expression.</p>
+<p>Note: This isn’t needed for the new alabaster theme. Why? Is there
+a workaround / better way to do this?</p>
+<p>This line handles docutils output.</p>
+<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="n">pre</span><span class="o">.</span><span class="n">literal</span><span class="o">-</span><span class="n">block</span> <span class="o">+</span> <span class="o">*</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>The remaining lines handle Sphinx output.</p>
+<div class="code highlight-python"><div class="highlight"><pre><span></span><span class="n">div</span><span class="o">.</span><span class="n">highlight</span><span class="o">-</span><span class="n">none</span> <span class="o">+</span> <span class="o">*</span><span class="p">,</span>
+<span class="n">div</span><span class="o">.</span><span class="n">highlight</span><span class="o">-</span><span class="n">nasm</span> <span class="o">+</span> <span class="o">*</span><span class="p">,</span>
+<span class="n">div</span><span class="o">.</span><span class="n">highlight</span><span class="o">-</span><span class="n">c</span> <span class="o">+</span> <span class="o">*</span><span class="p">,</span>
+<span class="n">div</span><span class="o">.</span><span class="n">highlight</span><span class="o">-</span><span class="n">python</span> <span class="o">+</span> <span class="o">*</span><span class="p">,</span>
+<span class="n">div</span><span class="o">.</span><span class="n">highlight</span><span class="o">-</span><span class="n">python3</span> <span class="o">+</span> <span class="o">*</span> <span class="p">{</span>
+  <span class="n">margin</span><span class="o">-</span><span class="n">top</span><span class="p">:</span> <span class="mi">0</span><span class="n">px</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CodeChat.css - Style sheet for CodeChat docs</a><ul>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to template’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="conf.py.html"
+                        title="next chapter">template/conf.py - Template configuration file for a Sphinx CodeChat project</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/CodeChat.css.css.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="conf.py.html" title="template/conf.py - Template configuration file for a Sphinx CodeChat project"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to template’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Project Name version 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Author.
+      Last updated on Aug, 09, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.1.
+    </div>
+  </body>
+</html>

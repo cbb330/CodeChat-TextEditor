@@ -82,6 +82,7 @@ class ThreadedServer(object):
                 if (dataCommand == ''):
                     print("Client closed")
                     break
+                print(dataCommand)
                 if(self.saveMode):
                     client.send(('0000000001T').encode())
                 else:
