@@ -271,7 +271,7 @@ def main():
             saveMode = False
             break
         else:
-            print("Error, please enter yes or no.\n")
+            print("Error, please enter true or false.\n")
             
         
     ThreadedServer('', 50646, saveMode).listen()

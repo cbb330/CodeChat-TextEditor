@@ -25,6 +25,7 @@ export default class CodechatPluginView {
     // Initializing socket and connecting to the server. Messages sent to the server
     // are in the `JSON <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON>`_ format.
     // The items sent through JSON are:
+    //
     // * File path
     // * File text content
     // * File project path
@@ -105,6 +106,7 @@ export default class CodechatPluginView {
          }
          //
          // Now the program determines what type of message it has received, the options being:
+         //
          // * HTML output => assigns HTML content to DOM Element
          // * An Error message => shows Error content as atom notification
          // * An Update on save/modified message => adjusts this.updateOnSave accordingly
